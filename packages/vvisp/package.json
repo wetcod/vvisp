@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "bdd-stdin": "^0.2.0",
-    "eth-gas-reporter": "^0.1.7",
+    "eth-gas-reporter": "^0.2.0",
     "ethereumjs-util": "^5.1.2",
     "ethjs-abi": "^0.2.1",
     "mitm": "^1.4.0",

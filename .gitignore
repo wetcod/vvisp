@@ -47,3 +47,4 @@ example
 
 .nyc_output
 sample/
+*.DS_Store
