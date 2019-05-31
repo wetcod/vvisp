@@ -1,90 +1,107 @@
-export const START = 'SESSION_START';
-export function start(provider, txHash) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.start = start;
+exports.loadTransaction = loadTransaction;
+exports.interrupt = interrupt;
+exports.unloadTransaction = unloadTransaction;
+exports.ready = ready;
+exports.wait = wait;
+exports.error = error;
+exports.clearError = clearError;
+exports.recordContracts = recordContracts;
+exports.saveTransaction = saveTransaction;
+exports.saveReceipt = saveReceipt;
+exports.saveBlock = saveBlock;
+var START = (exports.START = 'SESSION_START');
+function start(provider, txHash) {
   return {
     type: START,
-    provider,
-    txHash //OPTIONAL
+    provider: provider,
+    txHash: txHash //OPTIONAL
   };
 }
 
-export const LOAD_TRANSACTION = 'LOAD_TRANSACTION';
-export function loadTransaction(txHash) {
+var LOAD_TRANSACTION = (exports.LOAD_TRANSACTION = 'LOAD_TRANSACTION');
+function loadTransaction(txHash) {
   return {
     type: LOAD_TRANSACTION,
-    txHash
+    txHash: txHash
   };
 }
 
-export const INTERRUPT = 'SESSION_INTERRUPT';
-export function interrupt() {
+var INTERRUPT = (exports.INTERRUPT = 'SESSION_INTERRUPT');
+function interrupt() {
   return { type: INTERRUPT };
 }
 
-export const UNLOAD_TRANSACTION = 'UNLOAD_TRANSACTION';
-export function unloadTransaction() {
+var UNLOAD_TRANSACTION = (exports.UNLOAD_TRANSACTION = 'UNLOAD_TRANSACTION');
+function unloadTransaction() {
   return {
     type: UNLOAD_TRANSACTION
   };
 }
 
-export const READY = 'SESSION_READY';
-export function ready() {
+var READY = (exports.READY = 'SESSION_READY');
+function ready() {
   return {
     type: READY
   };
 }
 
-export const WAIT = 'SESSION_WAIT';
-export function wait() {
+var WAIT = (exports.WAIT = 'SESSION_WAIT');
+function wait() {
   return {
     type: WAIT
   };
 }
 
-export const ERROR = 'SESSION_ERROR';
-export function error(error) {
+var ERROR = (exports.ERROR = 'SESSION_ERROR');
+function error(error) {
   return {
     type: ERROR,
-    error
+    error: error
   };
 }
 
-export const CLEAR_ERROR = 'CLEAR_ERROR';
-export function clearError() {
+var CLEAR_ERROR = (exports.CLEAR_ERROR = 'CLEAR_ERROR');
+function clearError() {
   return {
     type: CLEAR_ERROR
   };
 }
 
-export const RECORD_CONTRACTS = 'RECORD_CONTRACTS';
-export function recordContracts(contexts, sources) {
+var RECORD_CONTRACTS = (exports.RECORD_CONTRACTS = 'RECORD_CONTRACTS');
+function recordContracts(contexts, sources) {
   return {
     type: RECORD_CONTRACTS,
-    contexts,
-    sources
+    contexts: contexts,
+    sources: sources
   };
 }
 
-export const SAVE_TRANSACTION = 'SAVE_TRANSACTION';
-export function saveTransaction(transaction) {
+var SAVE_TRANSACTION = (exports.SAVE_TRANSACTION = 'SAVE_TRANSACTION');
+function saveTransaction(transaction) {
   return {
     type: SAVE_TRANSACTION,
-    transaction
+    transaction: transaction
   };
 }
 
-export const SAVE_RECEIPT = 'SAVE_RECEIPT';
-export function saveReceipt(receipt) {
+var SAVE_RECEIPT = (exports.SAVE_RECEIPT = 'SAVE_RECEIPT');
+function saveReceipt(receipt) {
   return {
     type: SAVE_RECEIPT,
-    receipt
+    receipt: receipt
   };
 }
 
-export const SAVE_BLOCK = 'SAVE_BLOCK';
-export function saveBlock(block) {
+var SAVE_BLOCK = (exports.SAVE_BLOCK = 'SAVE_BLOCK');
+function saveBlock(block) {
   return {
     type: SAVE_BLOCK,
-    block
+    block: block
   };
 }

@@ -1,11 +1,46 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:trace:reducers');
+'use strict';
 
-import { combineReducers } from 'redux';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import * as actions from './actions';
+var _debug = require('debug');
 
-function index(state = 0, action) {
+var _debug2 = _interopRequireDefault(_debug);
+
+var _redux = require('redux');
+
+var _actions = require('./actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key];
+      }
+    }
+    newObj.default = obj;
+    return newObj;
+  }
+}
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var debug = (0, _debug2.default)('debugger:trace:reducers');
+
+function index() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.TOCK:
       return state + 1;
@@ -19,7 +54,11 @@ function index(state = 0, action) {
   }
 }
 
-function finished(state = false, action) {
+function finished() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.END_OF_TRACE:
       return true;
@@ -33,7 +72,11 @@ function finished(state = false, action) {
   }
 }
 
-function steps(state = null, action) {
+function steps() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_STEPS:
       return action.steps;
@@ -45,18 +88,18 @@ function steps(state = null, action) {
   }
 }
 
-const transaction = combineReducers({
-  steps
+var transaction = (0, _redux.combineReducers)({
+  steps: steps
 });
 
-const proc = combineReducers({
-  index,
-  finished
+var proc = (0, _redux.combineReducers)({
+  index: index,
+  finished: finished
 });
 
-const reducer = combineReducers({
-  transaction,
-  proc
+var reducer = (0, _redux.combineReducers)({
+  transaction: transaction,
+  proc: proc
 });
 
-export default reducer;
+exports.default = reducer;

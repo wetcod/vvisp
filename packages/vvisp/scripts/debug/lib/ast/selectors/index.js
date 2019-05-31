@@ -1,14 +1,29 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:ast:selectors');
+'use strict';
 
-import { createSelectorTree, createLeaf } from 'reselect-tree';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import solidity from 'lib/solidity/selectors';
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+var _reselectTree = require('reselect-tree');
+
+var _selectors = require('../../solidity/selectors');
+
+var _selectors2 = _interopRequireDefault(_selectors);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var debug = (0, _debug2.default)('debugger:ast:selectors');
 
 /**
  * ast
  */
-const ast = createSelectorTree({
+var ast = (0, _reselectTree.createSelectorTree)({
   /**
    * ast.views
    */
@@ -16,8 +31,13 @@ const ast = createSelectorTree({
     /**
      * ast.views.sources
      */
-    sources: createLeaf([solidity.info.sources], sources => sources)
+    sources: (0, _reselectTree.createLeaf)(
+      [_selectors2.default.info.sources],
+      function(sources) {
+        return sources;
+      }
+    )
   }
 });
 
-export default ast;
+exports.default = ast;

@@ -1,33 +1,43 @@
-export const ADD_SOURCE = 'SOLIDITY_ADD_SOURCE';
-export function addSource(source, sourcePath, ast, compiler) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.addSource = addSource;
+exports.jump = jump;
+exports.externalCall = externalCall;
+exports.externalReturn = externalReturn;
+exports.reset = reset;
+var ADD_SOURCE = (exports.ADD_SOURCE = 'SOLIDITY_ADD_SOURCE');
+function addSource(source, sourcePath, ast, compiler) {
   return {
     type: ADD_SOURCE,
-    source,
-    sourcePath,
-    ast,
-    compiler
+    source: source,
+    sourcePath: sourcePath,
+    ast: ast,
+    compiler: compiler
   };
 }
 
-export const JUMP = 'JUMP';
-export function jump(jumpDirection) {
+var JUMP = (exports.JUMP = 'JUMP');
+function jump(jumpDirection) {
   return {
     type: JUMP,
-    jumpDirection
+    jumpDirection: jumpDirection
   };
 }
 
-export const EXTERNAL_CALL = 'EXTERNAL_CALL';
-export function externalCall() {
+var EXTERNAL_CALL = (exports.EXTERNAL_CALL = 'EXTERNAL_CALL');
+function externalCall() {
   return { type: EXTERNAL_CALL };
 }
 
-export const EXTERNAL_RETURN = 'EXTERNAL_RETURN';
-export function externalReturn() {
+var EXTERNAL_RETURN = (exports.EXTERNAL_RETURN = 'EXTERNAL_RETURN');
+function externalReturn() {
   return { type: EXTERNAL_RETURN };
 }
 
-export const RESET = 'SOLIDITY_RESET';
-export function reset() {
+var RESET = (exports.RESET = 'SOLIDITY_RESET');
+function reset() {
   return { type: RESET };
 }

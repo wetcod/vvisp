@@ -1,97 +1,182 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:evm:selectors'); // eslint-disable-line no-unused-vars
+'use strict';
 
-import { createSelectorTree, createLeaf } from 'reselect-tree';
-import BN from 'bn.js';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import trace from 'lib/trace/selectors';
+var _extends =
+  Object.assign ||
+  function(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
 
-import * as DecodeUtils from 'truffle-decode-utils';
-import {
-  isCallMnemonic,
-  isCreateMnemonic,
-  isShortCallMnemonic,
-  isDelegateCallMnemonicBroad,
-  isDelegateCallMnemonicStrict,
-  isStaticCallMnemonic,
-  isNormalHaltingMnemonic
-} from 'lib/helpers';
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+var _reselectTree = require('reselect-tree');
+
+var _bn = require('bn.js');
+
+var _bn2 = _interopRequireDefault(_bn);
+
+var _selectors = require('../../trace/selectors');
+
+var _selectors2 = _interopRequireDefault(_selectors);
+
+var _truffleDecodeUtils = require('truffle-decode-utils');
+
+var DecodeUtils = _interopRequireWildcard(_truffleDecodeUtils);
+
+var _helpers = require('../../helpers');
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key];
+      }
+    }
+    newObj.default = obj;
+    return newObj;
+  }
+}
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+var debug = (0, _debug2.default)('debugger:evm:selectors'); // eslint-disable-line no-unused-vars
 
 /**
  * create EVM-level selectors for a given trace step selector
  * may specify additional selectors to include
  */
-function createStepSelectors(step, state = null) {
-  let base = {
+function createStepSelectors(step) {
+  var state =
+    arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  var base = {
     /**
      * .trace
      *
      * trace step info related to operation
      */
-    trace: createLeaf([step], step => {
+    trace: (0, _reselectTree.createLeaf)([step], function(step) {
       if (!step) {
         return null;
       }
-      let { gasCost, op, pc } = step;
-      return { gasCost, op, pc };
+      var gasCost = step.gasCost,
+        op = step.op,
+        pc = step.pc;
+
+      return { gasCost: gasCost, op: op, pc: pc };
     }),
 
     /**
      * .programCounter
      */
-    programCounter: createLeaf(['./trace'], step => (step ? step.pc : null)),
+    programCounter: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return step ? step.pc : null;
+    }),
 
     /**
      * .isJump
      */
-    isJump: createLeaf(
-      ['./trace'],
-      step => step.op != 'JUMPDEST' && step.op.indexOf('JUMP') == 0
-    ),
+    isJump: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return step.op != 'JUMPDEST' && step.op.indexOf('JUMP') == 0;
+    }),
 
     /**
      * .isCall
      *
      * whether the opcode will switch to another calling context
      */
-    isCall: createLeaf(['./trace'], step => isCallMnemonic(step.op)),
+    isCall: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return (0, _helpers.isCallMnemonic)(step.op);
+    }),
 
     /**
      * .isShortCall
      *
      * for calls that only take 6 arguments instead of 7
      */
-    isShortCall: createLeaf(['./trace'], step => isShortCallMnemonic(step.op)),
+    isShortCall: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return (0, _helpers.isShortCallMnemonic)(step.op);
+    }),
 
     /**
      * .isDelegateCallBroad
      *
      * for calls that delegate storage
      */
-    isDelegateCallBroad: createLeaf(['./trace'], step =>
-      isDelegateCallMnemonicBroad(step.op)
-    ),
+    isDelegateCallBroad: (0, _reselectTree.createLeaf)(['./trace'], function(
+      step
+    ) {
+      return (0, _helpers.isDelegateCallMnemonicBroad)(step.op);
+    }),
 
     /**
      * .isDelegateCallStrict
      *
      * for calls that additionally delegate sender and value
      */
-    isDelegateCallStrict: createLeaf(['./trace'], step =>
-      isDelegateCallMnemonicStrict(step.op)
-    ),
+    isDelegateCallStrict: (0, _reselectTree.createLeaf)(['./trace'], function(
+      step
+    ) {
+      return (0, _helpers.isDelegateCallMnemonicStrict)(step.op);
+    }),
 
     /**
      * .isStaticCall
      */
-    isStaticCall: createLeaf(['./trace'], step =>
-      isStaticCallMnemonic(step.op)
-    ),
+    isStaticCall: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return (0, _helpers.isStaticCallMnemonic)(step.op);
+    }),
 
     /**
      * .isCreate
      */
-    isCreate: createLeaf(['./trace'], step => isCreateMnemonic(step.op)),
+    isCreate: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return (0, _helpers.isCreateMnemonic)(step.op);
+    }),
 
     /**
      * .isHalting
@@ -99,38 +184,47 @@ function createStepSelectors(step, state = null) {
      * whether the instruction halts or returns from a calling context
      * (covers only ordinary halds, not exceptional halts)
      */
-    isHalting: createLeaf(['./trace'], step =>
-      isNormalHaltingMnemonic(step.op)
-    ),
+    isHalting: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return (0, _helpers.isNormalHaltingMnemonic)(step.op);
+    }),
 
     /*
      * .isStore
      */
-    isStore: createLeaf(['./trace'], step => step.op == 'SSTORE'),
+    isStore: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return step.op == 'SSTORE';
+    }),
 
     /*
      * .isLoad
      */
-    isLoad: createLeaf(['./trace'], step => step.op == 'SLOAD'),
+    isLoad: (0, _reselectTree.createLeaf)(['./trace'], function(step) {
+      return step.op == 'SLOAD';
+    }),
 
     /*
      * .touchesStorage
      *
      * whether the instruction involves storage
      */
-    touchesStorage: createLeaf(
+    touchesStorage: (0, _reselectTree.createLeaf)(
       ['./isStore', 'isLoad'],
-      (stores, loads) => stores || loads
+      function(stores, loads) {
+        return stores || loads;
+      }
     )
   };
 
   if (state) {
-    const isRelative = path =>
-      typeof path == 'string' &&
-      (path.startsWith('./') || path.startsWith('../'));
+    var isRelative = function isRelative(path) {
+      return (
+        typeof path == 'string' &&
+        (path.startsWith('./') || path.startsWith('../'))
+      );
+    };
 
     if (isRelative(state)) {
-      state = `../${state}`;
+      state = '../' + state;
     }
 
     Object.assign(base, {
@@ -139,36 +233,39 @@ function createStepSelectors(step, state = null) {
        *
        * address transferred to by call operation
        */
-      callAddress: createLeaf(
-        ['./isCall', state],
+      callAddress: (0, _reselectTree.createLeaf)(['./isCall', state], function(
+        matches,
+        _ref
+      ) {
+        var stack = _ref.stack;
 
-        (matches, { stack }) => {
-          if (!matches) {
-            return null;
-          }
-
-          let address = stack[stack.length - 2];
-          return DecodeUtils.Conversion.toAddress(address);
+        if (!matches) {
+          return null;
         }
-      ),
+
+        var address = stack[stack.length - 2];
+        return DecodeUtils.Conversion.toAddress(address);
+      }),
 
       /**
        * .createBinary
        *
        * binary code to execute via create operation
        */
-      createBinary: createLeaf(
+      createBinary: (0, _reselectTree.createLeaf)(
         ['./isCreate', state],
+        function(matches, _ref2) {
+          var stack = _ref2.stack,
+            memory = _ref2.memory;
 
-        (matches, { stack, memory }) => {
           if (!matches) {
             return null;
           }
 
           // Get the code that's going to be created from memory.
           // Note we multiply by 2 because these offsets are in bytes.
-          const offset = parseInt(stack[stack.length - 2], 16) * 2;
-          const length = parseInt(stack[stack.length - 3], 16) * 2;
+          var offset = parseInt(stack[stack.length - 2], 16) * 2;
+          var length = parseInt(stack[stack.length - 3], 16) * 2;
 
           return '0x' + memory.join('').substring(offset, offset + length);
         }
@@ -179,9 +276,12 @@ function createStepSelectors(step, state = null) {
        *
        * data passed to EVM call
        */
-      callData: createLeaf(
+      callData: (0, _reselectTree.createLeaf)(
         ['./isCall', './isShortCall', state],
-        (matches, short, { stack, memory }) => {
+        function(matches, short, _ref3) {
+          var stack = _ref3.stack,
+            memory = _ref3.memory;
+
           if (!matches) {
             return null;
           }
@@ -189,12 +289,12 @@ function createStepSelectors(step, state = null) {
           //if it's 6-argument call, the data start and offset will be one spot
           //higher in the stack than they would be for a 7-argument call, so
           //let's introduce an offset to handle this
-          let argOffset = short ? 1 : 0;
+          var argOffset = short ? 1 : 0;
 
           // Get the data from memory.
           // Note we multiply by 2 because these offsets are in bytes.
-          const offset = parseInt(stack[stack.length - 4 + argOffset], 16) * 2;
-          const length = parseInt(stack[stack.length - 5 + argOffset], 16) * 2;
+          var offset = parseInt(stack[stack.length - 4 + argOffset], 16) * 2;
+          var length = parseInt(stack[stack.length - 5 + argOffset], 16) * 2;
 
           return '0x' + memory.join('').substring(offset, offset + length);
         }
@@ -205,19 +305,21 @@ function createStepSelectors(step, state = null) {
        *
        * value for the call (not create); returns null for DELEGATECALL
        */
-      callValue: createLeaf(
+      callValue: (0, _reselectTree.createLeaf)(
         ['./isCall', './isDelegateCallStrict', './isStaticCall', state],
-        (calls, delegates, isStatic, { stack }) => {
+        function(calls, delegates, isStatic, _ref4) {
+          var stack = _ref4.stack;
+
           if (!calls || delegates) {
             return null;
           }
 
           if (isStatic) {
-            return new BN(0);
+            return new _bn2.default(0);
           }
 
           //otherwise, for CALL and CALLCODE, it's the 3rd argument
-          let value = stack[stack.length - 3];
+          var value = stack[stack.length - 3];
           return DecodeUtils.Conversion.toBN(value);
         }
       ),
@@ -227,15 +329,20 @@ function createStepSelectors(step, state = null) {
        *
        * value for the create
        */
-      createValue: createLeaf(['./isCreate', state], (matches, { stack }) => {
-        if (!matches) {
-          return null;
-        }
+      createValue: (0, _reselectTree.createLeaf)(
+        ['./isCreate', state],
+        function(matches, _ref5) {
+          var stack = _ref5.stack;
 
-        //creates have the value as the first argument
-        let value = stack[stack.length - 1];
-        return DecodeUtils.Conversion.toBN(value);
-      }),
+          if (!matches) {
+            return null;
+          }
+
+          //creates have the value as the first argument
+          var value = stack[stack.length - 1];
+          return DecodeUtils.Conversion.toBN(value);
+        }
+      ),
 
       /**
        * .storageAffected
@@ -243,10 +350,11 @@ function createStepSelectors(step, state = null) {
        * storage slot being stored to or loaded from
        * we do NOT prepend "0x"
        */
-      storageAffected: createLeaf(
+      storageAffected: (0, _reselectTree.createLeaf)(
         ['./touchesStorage', state],
+        function(matches, _ref6) {
+          var stack = _ref6.stack;
 
-        (matches, { stack }) => {
           if (!matches) {
             return null;
           }
@@ -260,11 +368,13 @@ function createStepSelectors(step, state = null) {
   return base;
 }
 
-const evm = createSelectorTree({
+var evm = (0, _reselectTree.createSelectorTree)({
   /**
    * evm.state
    */
-  state: state => state.evm,
+  state: function state(_state) {
+    return _state.evm;
+  },
 
   /**
    * evm.info
@@ -273,7 +383,9 @@ const evm = createSelectorTree({
     /**
      * evm.info.contexts
      */
-    contexts: createLeaf(['/state'], state => state.info.contexts.byContext),
+    contexts: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.info.contexts.byContext;
+    }),
 
     /**
      * evm.info.binaries
@@ -285,9 +397,13 @@ const evm = createSelectorTree({
        * returns function (binary) => context (returns the *ID* of the context)
        * (returns null on no match)
        */
-      search: createLeaf(['/info/contexts'], contexts => binary =>
-        DecodeUtils.Contexts.findDebuggerContext(contexts, binary)
-      )
+      search: (0, _reselectTree.createLeaf)(['/info/contexts'], function(
+        contexts
+      ) {
+        return function(binary) {
+          return DecodeUtils.Contexts.findDebuggerContext(contexts, binary);
+        };
+      })
     }
   },
 
@@ -298,10 +414,9 @@ const evm = createSelectorTree({
     /**
      * evm.transaction.instances
      */
-    instances: createLeaf(
-      ['/state'],
-      state => state.transaction.instances.byAddress
-    ),
+    instances: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.transaction.instances.byAddress;
+    }),
 
     /*
      * evm.transaction.globals
@@ -310,11 +425,15 @@ const evm = createSelectorTree({
       /*
        * evm.transaction.globals.tx
        */
-      tx: createLeaf(['/state'], state => state.transaction.globals.tx),
+      tx: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+        return state.transaction.globals.tx;
+      }),
       /*
        * evm.transaction.globals.block
        */
-      block: createLeaf(['/state'], state => state.transaction.globals.block)
+      block: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+        return state.transaction.globals.block;
+      })
     }
   },
 
@@ -325,29 +444,32 @@ const evm = createSelectorTree({
     /**
      * evm.current.callstack
      */
-    callstack: state => state.evm.proc.callstack,
+    callstack: function callstack(state) {
+      return state.evm.proc.callstack;
+    },
 
     /**
      * evm.current.call
      */
-    call: createLeaf(
-      ['./callstack'],
-
-      stack => (stack.length ? stack[stack.length - 1] : {})
-    ),
+    call: (0, _reselectTree.createLeaf)(['./callstack'], function(stack) {
+      return stack.length ? stack[stack.length - 1] : {};
+    }),
 
     /**
      * evm.current.context
      */
-    context: createLeaf(
+    context: (0, _reselectTree.createLeaf)(
       [
         './call',
         '/transaction/instances',
         '/info/binaries/search',
         '/info/contexts'
       ],
-      ({ address, binary }, instances, search, contexts) => {
-        let contextId;
+      function(_ref7, instances, search, contexts) {
+        var address = _ref7.address,
+          binary = _ref7.binary;
+
+        var contextId = void 0;
         if (address) {
           //if we're in a call to a deployed contract, we *must* have recorded
           //it in the instance table, so we just need to look up the context ID
@@ -363,12 +485,11 @@ const evm = createSelectorTree({
           return null;
         }
 
-        let context = contexts[contextId];
+        var context = contexts[contextId];
 
-        return {
-          ...context,
-          binary
-        };
+        return _extends({}, context, {
+          binary: binary
+        });
       }
     ),
 
@@ -377,68 +498,90 @@ const evm = createSelectorTree({
      *
      * evm state info: as of last operation, before op defined in step
      */
-    state: Object.assign(
-      {},
-      ...['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(param => ({
-        [param]: createLeaf([trace.step], step => step[param])
-      }))
+    state: Object.assign.apply(
+      Object,
+      [{}].concat(
+        _toConsumableArray(
+          ['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(function(
+            param
+          ) {
+            return _defineProperty(
+              {},
+              param,
+              (0, _reselectTree.createLeaf)(
+                [_selectors2.default.step],
+                function(step) {
+                  return step[param];
+                }
+              )
+            );
+          })
+        )
+      )
     ),
 
     /**
      * evm.current.step
      */
-    step: {
-      ...createStepSelectors(trace.step, './state'),
+    step: _extends(
+      {},
+      createStepSelectors(_selectors2.default.step, './state'),
+      {
+        //the following step selectors only exist for current, not next or any
+        //other step
 
-      //the following step selectors only exist for current, not next or any
-      //other step
-
-      /*
-       * evm.current.step.createdAddress
-       *
-       * address created by the current create step
-       */
-      createdAddress: createLeaf(
-        ['./isCreate', '/nextOfSameDepth/state/stack'],
-        (matches, stack) => {
-          if (!matches) {
-            return null;
+        /*
+         * evm.current.step.createdAddress
+         *
+         * address created by the current create step
+         */
+        createdAddress: (0, _reselectTree.createLeaf)(
+          ['./isCreate', '/nextOfSameDepth/state/stack'],
+          function(matches, stack) {
+            if (!matches) {
+              return null;
+            }
+            var address = stack[stack.length - 1];
+            return DecodeUtils.Conversion.toAddress(address);
           }
-          let address = stack[stack.length - 1];
-          return DecodeUtils.Conversion.toAddress(address);
-        }
-      ),
+        ),
 
-      /**
-       * evm.current.step.callsPrecompileOrExternal
-       *
-       * are we calling a precompiled contract or an externally-owned account,
-       * rather than a contract account that isn't precompiled?
-       */
-      callsPrecompileOrExternal: createLeaf(
-        ['./isCall', '/current/state/depth', '/next/state/depth'],
-        (calls, currentDepth, nextDepth) => calls && currentDepth === nextDepth
-      ),
+        /**
+         * evm.current.step.callsPrecompileOrExternal
+         *
+         * are we calling a precompiled contract or an externally-owned account,
+         * rather than a contract account that isn't precompiled?
+         */
+        callsPrecompileOrExternal: (0, _reselectTree.createLeaf)(
+          ['./isCall', '/current/state/depth', '/next/state/depth'],
+          function(calls, currentDepth, nextDepth) {
+            return calls && currentDepth === nextDepth;
+          }
+        ),
 
-      /**
-       * evm.current.step.isContextChange
-       * groups together calls, creates, halts, and exceptional halts
-       */
-      isContextChange: createLeaf(
-        ['/current/state/depth', '/next/state/depth'],
-        (currentDepth, nextDepth) => currentDepth !== nextDepth
-      ),
+        /**
+         * evm.current.step.isContextChange
+         * groups together calls, creates, halts, and exceptional halts
+         */
+        isContextChange: (0, _reselectTree.createLeaf)(
+          ['/current/state/depth', '/next/state/depth'],
+          function(currentDepth, nextDepth) {
+            return currentDepth !== nextDepth;
+          }
+        ),
 
-      /**
-       * evm.current.step.isExceptionalHalting
-       *
-       */
-      isExceptionalHalting: createLeaf(
-        ['./isHalting', '/current/state/depth', '/next/state/depth'],
-        (halting, currentDepth, nextDepth) =>
-          nextDepth < currentDepth && !halting
-      )
-    },
+        /**
+         * evm.current.step.isExceptionalHalting
+         *
+         */
+        isExceptionalHalting: (0, _reselectTree.createLeaf)(
+          ['./isHalting', '/current/state/depth', '/next/state/depth'],
+          function(halting, currentDepth, nextDepth) {
+            return nextDepth < currentDepth && !halting;
+          }
+        )
+      }
+    ),
 
     /**
      * evm.current.codex (namespace)
@@ -448,7 +591,9 @@ const evm = createSelectorTree({
        * evm.current.codex (selector)
        * the whole codex! not that that's very much at the moment
        */
-      _: createLeaf(['/state'], state => state.proc.codex),
+      _: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+        return state.proc.codex;
+      }),
 
       /**
        * evm.current.codex.storage
@@ -457,12 +602,14 @@ const evm = createSelectorTree({
        * work, since nothing else can interfere with the storage of a failed
        * creation call!)
        */
-      storage: createLeaf(
+      storage: (0, _reselectTree.createLeaf)(
         ['./_', '../state/storage', '../call'],
-        (codex, rawStorage, { storageAddress }) =>
-          storageAddress === DecodeUtils.EVM.ZERO_ADDRESS
+        function(codex, rawStorage, _ref9) {
+          var storageAddress = _ref9.storageAddress;
+          return storageAddress === DecodeUtils.EVM.ZERO_ADDRESS
             ? rawStorage //HACK -- if zero address ignore the codex
-            : codex[codex.length - 1].accounts[storageAddress].storage
+            : codex[codex.length - 1].accounts[storageAddress].storage;
+        }
       )
     }
   },
@@ -476,17 +623,32 @@ const evm = createSelectorTree({
      *
      * evm state as a result of next step operation
      */
-    state: Object.assign(
-      {},
-      ...['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(param => ({
-        [param]: createLeaf([trace.next], step => step[param])
-      }))
+    state: Object.assign.apply(
+      Object,
+      [{}].concat(
+        _toConsumableArray(
+          ['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(function(
+            param
+          ) {
+            return _defineProperty(
+              {},
+              param,
+              (0, _reselectTree.createLeaf)(
+                [_selectors2.default.next],
+                function(step) {
+                  return step[param];
+                }
+              )
+            );
+          })
+        )
+      )
     ),
 
     /*
      * evm.next.step
      */
-    step: createStepSelectors(trace.next, './state')
+    step: createStepSelectors(_selectors2.default.next, './state')
   },
 
   /**
@@ -498,13 +660,28 @@ const evm = createSelectorTree({
      *
      * evm state at the next step of same depth
      */
-    state: Object.assign(
-      {},
-      ...['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(param => ({
-        [param]: createLeaf([trace.nextOfSameDepth], step => step[param])
-      }))
+    state: Object.assign.apply(
+      Object,
+      [{}].concat(
+        _toConsumableArray(
+          ['depth', 'error', 'gas', 'memory', 'stack', 'storage'].map(function(
+            param
+          ) {
+            return _defineProperty(
+              {},
+              param,
+              (0, _reselectTree.createLeaf)(
+                [_selectors2.default.nextOfSameDepth],
+                function(step) {
+                  return step[param];
+                }
+              )
+            );
+          })
+        )
+      )
     )
   }
 });
 
-export default evm;
+exports.default = evm;

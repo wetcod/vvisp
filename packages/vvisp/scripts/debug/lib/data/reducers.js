@@ -1,19 +1,137 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:data:reducers');
+'use strict';
 
-import { combineReducers } from 'redux';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import * as actions from './actions';
+var _slicedToArray = (function() {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+    try {
+      for (
+        var _i = arr[Symbol.iterator](), _s;
+        !(_n = (_s = _i.next()).done);
+        _n = true
+      ) {
+        _arr.push(_s.value);
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i['return']) _i['return']();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+    return _arr;
+  }
+  return function(arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError(
+        'Invalid attempt to destructure non-iterable instance'
+      );
+    }
+  };
+})();
 
-import { slotAddress } from 'truffle-decoder';
-import { makeAssignment } from 'lib/helpers';
-import { Conversion, Definition, EVM } from 'truffle-decode-utils';
+var _extends =
+  Object.assign ||
+  function(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
 
-const DEFAULT_SCOPES = {
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+var _redux = require('redux');
+
+var _actions = require('./actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+var _truffleDecoder = require('truffle-decoder');
+
+var _helpers = require('../helpers');
+
+var _truffleDecodeUtils = require('truffle-decode-utils');
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key];
+      }
+    }
+    newObj.default = obj;
+    return newObj;
+  }
+}
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+
+var debug = (0, _debug2.default)('debugger:data:reducers');
+
+var DEFAULT_SCOPES = {
   byId: {}
 };
 
-function scopes(state = DEFAULT_SCOPES, action) {
+function scopes() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_SCOPES;
+  var action = arguments[1];
+
   var scope;
   var variables;
 
@@ -22,18 +140,20 @@ function scopes(state = DEFAULT_SCOPES, action) {
       scope = state.byId[action.id] || {};
 
       return {
-        byId: {
-          ...state.byId,
-
-          [action.id]: {
-            ...scope,
-
-            id: action.id,
-            sourceId: action.sourceId,
-            parentId: action.parentId,
-            pointer: action.pointer
-          }
-        }
+        byId: _extends(
+          {},
+          state.byId,
+          _defineProperty(
+            {},
+            action.id,
+            _extends({}, scope, {
+              id: action.id,
+              sourceId: action.sourceId,
+              parentId: action.parentId,
+              pointer: action.pointer
+            })
+          )
+        )
       };
 
     case actions.DECLARE:
@@ -41,19 +161,19 @@ function scopes(state = DEFAULT_SCOPES, action) {
       variables = scope.variables || [];
 
       return {
-        byId: {
-          ...state.byId,
-
-          [action.node.scope]: {
-            ...scope,
-
-            variables: [
-              ...variables,
-
-              { name: action.node.name, id: action.node.id }
-            ]
-          }
-        }
+        byId: _extends(
+          {},
+          state.byId,
+          _defineProperty(
+            {},
+            action.node.scope,
+            _extends({}, scope, {
+              variables: [].concat(_toConsumableArray(variables), [
+                { name: action.node.name, id: action.node.id }
+              ])
+            })
+          )
+        )
       };
 
     default:
@@ -68,22 +188,32 @@ function scopes(state = DEFAULT_SCOPES, action) {
 //this will become a bug you'll have to fix, and you'll have to fix it in the
 //decoder, too.  Sorry, future me! (or whoever's stuck doing this)
 
-function userDefinedTypes(state = [], action) {
+function userDefinedTypes() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.DEFINE_TYPE:
-      return [...state, action.node.id];
+      return [].concat(_toConsumableArray(state), [action.node.id]);
     default:
       return state;
   }
 }
 
-const DEFAULT_ALLOCATIONS = {
+var DEFAULT_ALLOCATIONS = {
   storage: {},
   memory: {},
   calldata: {}
 };
 
-function allocations(state = DEFAULT_ALLOCATIONS, action) {
+function allocations() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_ALLOCATIONS;
+  var action = arguments[1];
+
   if (action.type === actions.ALLOCATE) {
     return {
       storage: action.storage,
@@ -95,57 +225,93 @@ function allocations(state = DEFAULT_ALLOCATIONS, action) {
   }
 }
 
-const info = combineReducers({
-  scopes,
-  userDefinedTypes,
-  allocations
+var info = (0, _redux.combineReducers)({
+  scopes: scopes,
+  userDefinedTypes: userDefinedTypes,
+  allocations: allocations
 });
 
-const GLOBAL_ASSIGNMENTS = [
+var GLOBAL_ASSIGNMENTS = [
   [{ builtin: 'msg' }, { special: 'msg' }],
   [{ builtin: 'tx' }, { special: 'tx' }],
   [{ builtin: 'block' }, { special: 'block' }],
   [{ builtin: 'this' }, { special: 'this' }],
   [{ builtin: 'now' }, { special: 'timestamp' }] //we don't have an alias "now"
-].map(([idObj, ref]) => makeAssignment(idObj, ref));
+].map(function(_ref) {
+  var _ref2 = _slicedToArray(_ref, 2),
+    idObj = _ref2[0],
+    ref = _ref2[1];
 
-const DEFAULT_ASSIGNMENTS = {
-  byId: Object.assign(
-    {}, //we start out with all globals assigned
-    ...GLOBAL_ASSIGNMENTS.map(assignment => ({ [assignment.id]: assignment }))
+  return (0, _helpers.makeAssignment)(idObj, ref);
+});
+
+var DEFAULT_ASSIGNMENTS = {
+  byId: Object.assign.apply(
+    Object,
+    [{}].concat(
+      _toConsumableArray(
+        GLOBAL_ASSIGNMENTS.map(function(assignment) {
+          return _defineProperty({}, assignment.id, assignment);
+        })
+      )
+    )
   ),
   byAstId: {}, //no regular variables assigned at start
-  byBuiltin: Object.assign(
-    {}, //again, all globals start assigned
-    ...GLOBAL_ASSIGNMENTS.map(assignment => ({
-      [assignment.builtin]: [assignment.id] //yes, that's a 1-element array
-    }))
+  byBuiltin: Object.assign.apply(
+    Object,
+    [{}].concat(
+      _toConsumableArray(
+        GLOBAL_ASSIGNMENTS.map(function(assignment) {
+          return _defineProperty({}, assignment.builtin, [assignment.id]);
+        })
+      )
+    )
   )
 };
 
-function assignments(state = DEFAULT_ASSIGNMENTS, action) {
+function assignments() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_ASSIGNMENTS;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.ASSIGN:
     case actions.MAP_PATH_AND_ASSIGN:
       debug('action.type %O', action.type);
       debug('action.assignments %O', action.assignments);
-      return Object.values(action.assignments).reduce((acc, assignment) => {
-        let { id, astId } = assignment;
+      return Object.values(action.assignments).reduce(function(
+        acc,
+        assignment
+      ) {
+        var id = assignment.id,
+          astId = assignment.astId;
         //we assume for now that only ordinary variables will be assigned this
         //way, and not globals; globals are handled in DEFAULT_ASSIGNMENTS
-        return {
-          ...acc,
-          byId: {
-            ...acc.byId,
-            [id]: assignment
-          },
-          byAstId: {
-            ...acc.byAstId,
-            [astId]: [...new Set([...(acc.byAstId[astId] || []), id])]
-            //we use a set for uniqueness
-          }
-        };
-      }, state);
+
+        return _extends({}, acc, {
+          byId: _extends({}, acc.byId, _defineProperty({}, id, assignment)),
+          byAstId: _extends(
+            {},
+            acc.byAstId,
+            _defineProperty(
+              {},
+              astId,
+              [].concat(
+                _toConsumableArray(
+                  new Set(
+                    [].concat(_toConsumableArray(acc.byAstId[astId] || []), [
+                      id
+                    ])
+                  )
+                )
+              )
+            )
+          )
+        });
+      },
+      state);
 
     case actions.RESET:
       return DEFAULT_ASSIGNMENTS;
@@ -155,7 +321,7 @@ function assignments(state = DEFAULT_ASSIGNMENTS, action) {
   }
 }
 
-const DEFAULT_PATHS = {
+var DEFAULT_PATHS = {
   byAddress: {}
 };
 
@@ -163,10 +329,19 @@ const DEFAULT_PATHS = {
 //involve mapping keys!  Yes, many will get mapped, but there is no guarantee.
 //Only when mapping keys are involved does it necessarily work reliably --
 //which is fine, as that's all we need it for.
-function mappedPaths(state = DEFAULT_PATHS, action) {
+function mappedPaths() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_PATHS;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.MAP_PATH_AND_ASSIGN:
-      let { address, slot, typeIdentifier, parentType } = action;
+      var address = action.address,
+        slot = action.slot,
+        typeIdentifier = action.typeIdentifier,
+        parentType = action.parentType;
       //how this case works: first, we find the spot in our table (based on
       //address, type identifier, and slot address) where the new entry should
       //be added; if needed we set up all the objects needed along the way.  If
@@ -185,48 +360,57 @@ function mappedPaths(state = DEFAULT_PATHS, action) {
 
       //we do NOT want to distinguish between types with and without "_ptr" on
       //the end here!
+
       debug('typeIdentifier %s', typeIdentifier);
-      typeIdentifier = Definition.restorePtr(typeIdentifier);
-      parentType = Definition.restorePtr(parentType);
+      typeIdentifier = _truffleDecodeUtils.Definition.restorePtr(
+        typeIdentifier
+      );
+      parentType = _truffleDecodeUtils.Definition.restorePtr(parentType);
 
       debug('slot %o', slot);
-      let hexSlotAddress = Conversion.toHexString(
-        slotAddress(slot),
-        EVM.WORD_SIZE
+      var hexSlotAddress = _truffleDecodeUtils.Conversion.toHexString(
+        (0, _truffleDecoder.slotAddress)(slot),
+        _truffleDecodeUtils.EVM.WORD_SIZE
       );
-      let parentAddress = slot.path
-        ? Conversion.toHexString(slotAddress(slot.path), EVM.WORD_SIZE)
+      var parentAddress = slot.path
+        ? _truffleDecodeUtils.Conversion.toHexString(
+            (0, _truffleDecoder.slotAddress)(slot.path),
+            _truffleDecodeUtils.EVM.WORD_SIZE
+          )
         : undefined;
 
       //this is going to be messy and procedural, sorry.  but let's start with
       //the easy stuff: create the new address if needed, clone if not
-      let newState = {
-        ...state,
-        byAddress: {
-          ...state.byAddress,
-          [address]: {
-            byType: {
-              ...(state.byAddress[address] || { byType: {} }).byType
-            }
-          }
-        }
-      };
+      var newState = _extends({}, state, {
+        byAddress: _extends(
+          {},
+          state.byAddress,
+          _defineProperty({}, address, {
+            byType: _extends(
+              {},
+              (state.byAddress[address] || { byType: {} }).byType
+            )
+          })
+        )
+      });
 
       //now, let's add in the new type, if needed
-      newState.byAddress[address].byType = {
-        ...newState.byAddress[address].byType,
-        [typeIdentifier]: {
-          bySlotAddress: {
-            ...(
+      newState.byAddress[address].byType = _extends(
+        {},
+        newState.byAddress[address].byType,
+        _defineProperty({}, typeIdentifier, {
+          bySlotAddress: _extends(
+            {},
+            (
               newState.byAddress[address].byType[typeIdentifier] || {
                 bySlotAddress: {}
               }
             ).bySlotAddress
-          }
-        }
-      };
+          )
+        })
+      );
 
-      let oldSlot =
+      var oldSlot =
         newState.byAddress[address].byType[typeIdentifier].bySlotAddress[
           hexSlotAddress
         ];
@@ -234,7 +418,7 @@ function mappedPaths(state = DEFAULT_PATHS, action) {
       //clone or create empty (and we don't want undefined!)
       //now: is there something already there or no?  if no, we must add
       if (oldSlot === undefined) {
-        let newSlot;
+        var newSlot = void 0;
         debug('parentAddress %o', parentAddress);
         if (
           parentAddress !== undefined &&
@@ -245,13 +429,12 @@ function mappedPaths(state = DEFAULT_PATHS, action) {
         ) {
           //if the parent is already present, use that instead of the given
           //parent!
-          newSlot = {
-            ...slot,
+          newSlot = _extends({}, slot, {
             path:
               newState.byAddress[address].byType[parentType].bySlotAddress[
                 parentAddress
               ]
-          };
+          });
         } else {
           newSlot = slot;
         }
@@ -271,14 +454,14 @@ function mappedPaths(state = DEFAULT_PATHS, action) {
   }
 }
 
-const proc = combineReducers({
-  assignments,
-  mappedPaths
+var proc = (0, _redux.combineReducers)({
+  assignments: assignments,
+  mappedPaths: mappedPaths
 });
 
-const reducer = combineReducers({
-  info,
-  proc
+var reducer = (0, _redux.combineReducers)({
+  info: info,
+  proc: proc
 });
 
-export default reducer;
+exports.default = reducer;

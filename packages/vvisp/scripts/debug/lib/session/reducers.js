@@ -1,17 +1,66 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:session:reducers');
+'use strict';
 
-import { combineReducers } from 'redux';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import data from 'lib/data/reducers';
-import evm from 'lib/evm/reducers';
-import solidity from 'lib/solidity/reducers';
-import trace from 'lib/trace/reducers';
-import controller from 'lib/controller/reducers';
+var _debug = require('debug');
 
-import * as actions from './actions';
+var _debug2 = _interopRequireDefault(_debug);
 
-function ready(state = false, action) {
+var _redux = require('redux');
+
+var _reducers = require('../data/reducers');
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+var _reducers3 = require('../evm/reducers');
+
+var _reducers4 = _interopRequireDefault(_reducers3);
+
+var _reducers5 = require('../solidity/reducers');
+
+var _reducers6 = _interopRequireDefault(_reducers5);
+
+var _reducers7 = require('../trace/reducers');
+
+var _reducers8 = _interopRequireDefault(_reducers7);
+
+var _reducers9 = require('../controller/reducers');
+
+var _reducers10 = _interopRequireDefault(_reducers9);
+
+var _actions = require('./actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key];
+      }
+    }
+    newObj.default = obj;
+    return newObj;
+  }
+}
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var debug = (0, _debug2.default)('debugger:session:reducers');
+
+function ready() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.READY:
       debug('readying');
@@ -25,7 +74,11 @@ function ready(state = false, action) {
   }
 }
 
-function projectInfoComputed(state = false, action) {
+function projectInfoComputed() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.PROJECT_INFO_COMPUTED:
       return true;
@@ -34,7 +87,11 @@ function projectInfoComputed(state = false, action) {
   }
 }
 
-function lastLoadingError(state = null, action) {
+function lastLoadingError() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.ERROR:
       debug('error: %o', action.error);
@@ -48,7 +105,11 @@ function lastLoadingError(state = null, action) {
   }
 }
 
-function transaction(state = {}, action) {
+function transaction() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_TRANSACTION:
       return action.transaction;
@@ -59,7 +120,11 @@ function transaction(state = {}, action) {
   }
 }
 
-function receipt(state = {}, action) {
+function receipt() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_RECEIPT:
       return action.receipt;
@@ -70,7 +135,11 @@ function receipt(state = {}, action) {
   }
 }
 
-function block(state = {}, action) {
+function block() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_BLOCK:
       return action.block;
@@ -81,22 +150,22 @@ function block(state = {}, action) {
   }
 }
 
-const session = combineReducers({
-  ready,
-  lastLoadingError,
-  projectInfoComputed,
-  transaction,
-  receipt,
-  block
+var session = (0, _redux.combineReducers)({
+  ready: ready,
+  lastLoadingError: lastLoadingError,
+  projectInfoComputed: projectInfoComputed,
+  transaction: transaction,
+  receipt: receipt,
+  block: block
 });
 
-const reduceState = combineReducers({
-  session,
-  data,
-  evm,
-  solidity,
-  trace,
-  controller
+var reduceState = (0, _redux.combineReducers)({
+  session: session,
+  data: _reducers2.default,
+  evm: _reducers4.default,
+  solidity: _reducers6.default,
+  trace: _reducers8.default,
+  controller: _reducers10.default
 });
 
-export default reduceState;
+exports.default = reduceState;

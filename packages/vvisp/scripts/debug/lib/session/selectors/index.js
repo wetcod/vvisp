@@ -1,17 +1,105 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:session:selectors');
+'use strict';
 
-import { createSelectorTree, createLeaf } from 'reselect-tree';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import evm from 'lib/evm/selectors';
-import trace from 'lib/trace/selectors';
-import solidity from 'lib/solidity/selectors';
+var _slicedToArray = (function() {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+    try {
+      for (
+        var _i = arr[Symbol.iterator](), _s;
+        !(_n = (_s = _i.next()).done);
+        _n = true
+      ) {
+        _arr.push(_s.value);
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i['return']) _i['return']();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+    return _arr;
+  }
+  return function(arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError(
+        'Invalid attempt to destructure non-iterable instance'
+      );
+    }
+  };
+})();
 
-const session = createSelectorTree({
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+var _reselectTree = require('reselect-tree');
+
+var _selectors = require('../..//evm/selectors');
+
+var _selectors2 = _interopRequireDefault(_selectors);
+
+var _selectors3 = require('../../trace/selectors');
+
+var _selectors4 = _interopRequireDefault(_selectors3);
+
+var _selectors5 = require('../../solidity/selectors');
+
+var _selectors6 = _interopRequireDefault(_selectors5);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+var debug = (0, _debug2.default)('debugger:session:selectors');
+
+var session = (0, _reselectTree.createSelectorTree)({
   /*
    * session.state
    */
-  state: state => state.session,
+  state: function state(_state) {
+    return _state.session;
+  },
 
   /**
    * session.info
@@ -20,29 +108,45 @@ const session = createSelectorTree({
     /**
      * session.info.affectedInstances
      */
-    affectedInstances: createLeaf(
-      [evm.transaction.instances, evm.info.contexts, solidity.info.sources],
+    affectedInstances: (0, _reselectTree.createLeaf)(
+      [
+        _selectors2.default.transaction.instances,
+        _selectors2.default.info.contexts,
+        _selectors6.default.info.sources
+      ],
+      function(instances, contexts, sources) {
+        return Object.assign.apply(
+          Object,
+          [{}].concat(
+            _toConsumableArray(
+              Object.entries(instances).map(function(_ref) {
+                var _ref2 = _slicedToArray(_ref, 2),
+                  address = _ref2[0],
+                  _ref2$ = _ref2[1],
+                  context = _ref2$.context,
+                  binary = _ref2$.binary;
 
-      (instances, contexts, sources) =>
-        Object.assign(
-          {},
-          ...Object.entries(instances).map(([address, { context, binary }]) => {
-            debug('instances %O', instances);
-            debug('contexts %O', contexts);
-            let { contractName, primarySource } = contexts[context];
+                debug('instances %O', instances);
+                debug('contexts %O', contexts);
+                var _contexts$context = contexts[context],
+                  contractName = _contexts$context.contractName,
+                  primarySource = _contexts$context.primarySource;
 
-            let source =
-              primarySource !== undefined ? sources[primarySource] : undefined;
+                var source =
+                  primarySource !== undefined
+                    ? sources[primarySource]
+                    : undefined;
 
-            return {
-              [address]: {
-                contractName,
-                source,
-                binary
-              }
-            };
-          })
-        )
+                return _defineProperty({}, address, {
+                  contractName: contractName,
+                  source: source,
+                  binary: binary
+                });
+              })
+            )
+          )
+        );
+      }
     )
   },
 
@@ -54,19 +158,25 @@ const session = createSelectorTree({
      * session.transaction (selector)
      * contains the web3 transaction object
      */
-    _: createLeaf(['/state'], state => state.transaction),
+    _: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.transaction;
+    }),
 
     /**
      * session.transaction.receipt
      * contains the web3 receipt object
      */
-    receipt: createLeaf(['/state'], state => state.receipt),
+    receipt: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.receipt;
+    }),
 
     /**
      * session.transaction.block
      * contains the web3 block object
      */
-    block: createLeaf(['/state'], state => state.block)
+    block: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.block;
+    })
   },
 
   /*
@@ -76,57 +186,77 @@ const session = createSelectorTree({
     /*
      * session.status.readyOrError
      */
-    readyOrError: createLeaf(['/state'], state => state.ready),
+    readyOrError: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.ready;
+    }),
 
     /*
      * session.status.ready
      */
-    ready: createLeaf(
+    ready: (0, _reselectTree.createLeaf)(
       ['./readyOrError', './isError'],
-      (readyOrError, error) => readyOrError && !error
+      function(readyOrError, error) {
+        return readyOrError && !error;
+      }
     ),
 
     /*
      * session.status.waiting
      */
-    waiting: createLeaf(['/state'], state => !state.ready),
+    waiting: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return !state.ready;
+    }),
 
     /*
      * session.status.error
      */
-    error: createLeaf(['/state'], state => state.lastLoadingError),
+    error: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.lastLoadingError;
+    }),
 
     /*
      * session.status.isError
      */
-    isError: createLeaf(['./error'], error => error !== null),
+    isError: (0, _reselectTree.createLeaf)(['./error'], function(error) {
+      return error !== null;
+    }),
 
     /*
      * session.status.success
      */
-    success: createLeaf(['./error'], error => error === null),
+    success: (0, _reselectTree.createLeaf)(['./error'], function(error) {
+      return error === null;
+    }),
 
     /*
      * session.status.errored
      */
-    errored: createLeaf(
+    errored: (0, _reselectTree.createLeaf)(
       ['./readyOrError', './isError'],
-      (readyOrError, error) => readyOrError && error
+      function(readyOrError, error) {
+        return readyOrError && error;
+      }
     ),
 
     /*
      * session.status.loaded
      */
-    loaded: createLeaf([trace.loaded], loaded => loaded),
+    loaded: (0, _reselectTree.createLeaf)(
+      [_selectors4.default.loaded],
+      function(loaded) {
+        return loaded;
+      }
+    ),
 
     /*
      * session.status.projectInfoComputed
      */
-    projectInfoComputed: createLeaf(
-      ['/state'],
-      state => state.projectInfoComputed
-    )
+    projectInfoComputed: (0, _reselectTree.createLeaf)(['/state'], function(
+      state
+    ) {
+      return state.projectInfoComputed;
+    })
   }
 });
 
-export default session;
+exports.default = session;

@@ -1,6 +1,12 @@
-import { createSelectorTree, createLeaf } from 'reselect-tree';
+'use strict';
 
-const PAST_END_OF_TRACE = {
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _reselectTree = require('reselect-tree');
+
+var PAST_END_OF_TRACE = {
   depth: -1, //this is the part that matters!
   //the rest of this is just to look like a trace step
   error: '',
@@ -13,34 +19,42 @@ const PAST_END_OF_TRACE = {
   pc: -1 //this is not at all valid but that's fine
 };
 
-let trace = createSelectorTree({
+var trace = (0, _reselectTree.createSelectorTree)({
   /**
    * trace.index
    *
    * current step index
    */
-  index: state => state.trace.proc.index,
+  index: function index(state) {
+    return state.trace.proc.index;
+  },
 
   /*
    * trace.loaded
    * is a trace loaded?
    */
-  loaded: createLeaf(['/steps'], steps => steps !== null),
+  loaded: (0, _reselectTree.createLeaf)(['/steps'], function(steps) {
+    return steps !== null;
+  }),
 
   /**
    * trace.finished
    * is the trace finished?
    */
-  finished: state => state.trace.proc.finished,
+  finished: function finished(state) {
+    return state.trace.proc.finished;
+  },
 
   /**
    * trace.finishedOrUnloaded
    *
    * is the trace finished, including if it's unloaded?
    */
-  finishedOrUnloaded: createLeaf(
+  finishedOrUnloaded: (0, _reselectTree.createLeaf)(
     ['/finished', '/loaded'],
-    (finished, loaded) => finished || !loaded
+    function(finished, loaded) {
+      return finished || !loaded;
+    }
   ),
 
   /**
@@ -48,16 +62,20 @@ let trace = createSelectorTree({
    *
    * all trace steps
    */
-  steps: state => state.trace.transaction.steps,
+  steps: function steps(state) {
+    return state.trace.transaction.steps;
+  },
 
   /**
    * trace.stepsRemaining
    *
    * number of steps remaining in trace
    */
-  stepsRemaining: createLeaf(
+  stepsRemaining: (0, _reselectTree.createLeaf)(
     ['./steps', './index'],
-    (steps, index) => steps.length - index
+    function(steps, index) {
+      return steps.length - index;
+    }
   ),
 
   /**
@@ -65,9 +83,11 @@ let trace = createSelectorTree({
    *
    * current trace step
    */
-  step: createLeaf(
+  step: (0, _reselectTree.createLeaf)(
     ['./steps', './index'],
-    (steps, index) => (steps ? steps[index] : null) //null if no tx loaded
+    function(steps, index) {
+      return steps ? steps[index] : null;
+    } //null if no tx loaded
   ),
 
   /**
@@ -77,9 +97,12 @@ let trace = createSelectorTree({
    * HACK: if at the end,
    * we will return a spoofed "past end" step
    */
-  next: createLeaf(['./steps', './index'], (steps, index) =>
-    index < steps.length - 1 ? steps[index + 1] : PAST_END_OF_TRACE
-  ),
+  next: (0, _reselectTree.createLeaf)(['./steps', './index'], function(
+    steps,
+    index
+  ) {
+    return index < steps.length - 1 ? steps[index + 1] : PAST_END_OF_TRACE;
+  }),
 
   /*
    * trace.nextOfSameDepth
@@ -87,10 +110,15 @@ let trace = createSelectorTree({
    * NOTE: if there is none, will return undefined
    * (should not be used in such cases)
    */
-  nextOfSameDepth: createLeaf(['./steps', './index'], (steps, index) => {
-    let depth = steps[index].depth;
-    return steps.slice(index + 1).find(step => step.depth === depth);
-  })
+  nextOfSameDepth: (0, _reselectTree.createLeaf)(
+    ['./steps', './index'],
+    function(steps, index) {
+      var depth = steps[index].depth;
+      return steps.slice(index + 1).find(function(step) {
+        return step.depth === depth;
+      });
+    }
+  )
 });
 
-export default trace;
+exports.default = trace;

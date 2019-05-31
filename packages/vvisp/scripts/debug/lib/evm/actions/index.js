@@ -1,119 +1,138 @@
-export const ADD_CONTEXT = 'EVM_ADD_CONTEXT';
-export function addContext({
-  contractName,
-  binary,
-  sourceMap,
-  compiler,
-  abi,
-  contractId,
-  contractKind,
-  isConstructor
-}) {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.addContext = addContext;
+exports.normalizeContexts = normalizeContexts;
+exports.addInstance = addInstance;
+exports.saveGlobals = saveGlobals;
+exports.call = call;
+exports.create = create;
+exports.returnCall = returnCall;
+exports.fail = fail;
+exports.store = store;
+exports.load = load;
+exports.reset = reset;
+exports.unloadTransaction = unloadTransaction;
+var ADD_CONTEXT = (exports.ADD_CONTEXT = 'EVM_ADD_CONTEXT');
+function addContext(_ref) {
+  var contractName = _ref.contractName,
+    binary = _ref.binary,
+    sourceMap = _ref.sourceMap,
+    compiler = _ref.compiler,
+    abi = _ref.abi,
+    contractId = _ref.contractId,
+    contractKind = _ref.contractKind,
+    isConstructor = _ref.isConstructor;
+
   return {
     type: ADD_CONTEXT,
-    contractName,
-    binary,
-    sourceMap,
-    compiler,
-    abi,
-    contractId,
-    contractKind,
-    isConstructor
+    contractName: contractName,
+    binary: binary,
+    sourceMap: sourceMap,
+    compiler: compiler,
+    abi: abi,
+    contractId: contractId,
+    contractKind: contractKind,
+    isConstructor: isConstructor
   };
 }
 
-export const NORMALIZE_CONTEXTS = 'EVM_NORMALIZE_CONTEXTS';
-export function normalizeContexts() {
+var NORMALIZE_CONTEXTS = (exports.NORMALIZE_CONTEXTS =
+  'EVM_NORMALIZE_CONTEXTS');
+function normalizeContexts() {
   return { type: NORMALIZE_CONTEXTS };
 }
 
-export const ADD_INSTANCE = 'EVM_ADD_INSTANCE';
-export function addInstance(address, context, binary) {
+var ADD_INSTANCE = (exports.ADD_INSTANCE = 'EVM_ADD_INSTANCE');
+function addInstance(address, context, binary) {
   return {
     type: ADD_INSTANCE,
-    address,
-    context,
-    binary
+    address: address,
+    context: context,
+    binary: binary
   };
 }
 
-export const SAVE_GLOBALS = 'SAVE_GLOBALS';
-export function saveGlobals(origin, gasprice, block) {
+var SAVE_GLOBALS = (exports.SAVE_GLOBALS = 'SAVE_GLOBALS');
+function saveGlobals(origin, gasprice, block) {
   return {
     type: SAVE_GLOBALS,
-    origin,
-    gasprice,
-    block
+    origin: origin,
+    gasprice: gasprice,
+    block: block
   };
 }
 
-export const CALL = 'CALL';
-export function call(address, data, storageAddress, sender, value) {
+var CALL = (exports.CALL = 'CALL');
+function call(address, data, storageAddress, sender, value) {
   return {
     type: CALL,
-    address,
-    data,
-    storageAddress,
-    sender,
-    value
+    address: address,
+    data: data,
+    storageAddress: storageAddress,
+    sender: sender,
+    value: value
   };
 }
 
-export const CREATE = 'CREATE';
-export function create(binary, storageAddress, sender, value) {
+var CREATE = (exports.CREATE = 'CREATE');
+function create(binary, storageAddress, sender, value) {
   return {
     type: CREATE,
-    binary,
-    storageAddress,
-    sender,
-    value
+    binary: binary,
+    storageAddress: storageAddress,
+    sender: sender,
+    value: value
   };
 }
 
-export const RETURN = 'RETURN';
-export function returnCall() {
+var RETURN = (exports.RETURN = 'RETURN');
+function returnCall() {
   return {
     type: RETURN
   };
 }
 
-export const FAIL = 'FAIL';
-export function fail() {
+var FAIL = (exports.FAIL = 'FAIL');
+function fail() {
   return {
     type: FAIL
   };
 }
 
-export const STORE = 'STORE';
-export function store(address, slot, value) {
+var STORE = (exports.STORE = 'STORE');
+function store(address, slot, value) {
   return {
     type: STORE,
-    address,
-    slot,
-    value
+    address: address,
+    slot: slot,
+    value: value
   };
 }
 
-export const LOAD = 'LOAD';
-export function load(address, slot, value) {
+var LOAD = (exports.LOAD = 'LOAD');
+function load(address, slot, value) {
   return {
     type: LOAD,
-    address,
-    slot,
-    value
+    address: address,
+    slot: slot,
+    value: value
   };
 }
 
-export const RESET = 'EVM_RESET';
-export function reset(storageAddress) {
+var RESET = (exports.RESET = 'EVM_RESET');
+function reset(storageAddress) {
   return {
     type: RESET,
-    storageAddress
+    storageAddress: storageAddress
   };
 }
 
-export const UNLOAD_TRANSACTION = 'EVM_UNLOAD_TRANSACTION';
-export function unloadTransaction() {
+var UNLOAD_TRANSACTION = (exports.UNLOAD_TRANSACTION =
+  'EVM_UNLOAD_TRANSACTION');
+function unloadTransaction() {
   return {
     type: UNLOAD_TRANSACTION
   };

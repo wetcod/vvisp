@@ -1,62 +1,143 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:evm:reducers');
+'use strict';
 
-import { combineReducers } from 'redux';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import * as actions from './actions';
-import { keccak256, extractPrimarySource } from 'lib/helpers';
-import * as DecodeUtils from 'truffle-decode-utils';
+var _extends =
+  Object.assign ||
+  function(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
 
-import BN from 'bn.js';
+var _debug = require('debug');
 
-const DEFAULT_CONTEXTS = {
+var _debug2 = _interopRequireDefault(_debug);
+
+var _redux = require('redux');
+
+var _actions = require('./actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+var _helpers = require('../helpers');
+
+var _truffleDecodeUtils = require('truffle-decode-utils');
+
+var DecodeUtils = _interopRequireWildcard(_truffleDecodeUtils);
+
+var _bn = require('bn.js');
+
+var _bn2 = _interopRequireDefault(_bn);
+
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key))
+          newObj[key] = obj[key];
+      }
+    }
+    newObj.default = obj;
+    return newObj;
+  }
+}
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+  return obj;
+}
+
+var debug = (0, _debug2.default)('debugger:evm:reducers');
+
+var DEFAULT_CONTEXTS = {
   byContext: {}
 };
 
-function contexts(state = DEFAULT_CONTEXTS, action) {
+function contexts() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_CONTEXTS;
+  var action = arguments[1];
+
   switch (action.type) {
     /*
      * Adding a new context
      */
     case actions.ADD_CONTEXT:
-      const {
-        contractName,
-        binary,
-        sourceMap,
-        compiler,
-        abi,
-        contractId,
-        contractKind,
-        isConstructor
-      } = action;
+      var contractName = action.contractName,
+        binary = action.binary,
+        sourceMap = action.sourceMap,
+        compiler = action.compiler,
+        abi = action.abi,
+        contractId = action.contractId,
+        contractKind = action.contractKind,
+        isConstructor = action.isConstructor;
+
       debug('action %O', action);
       //NOTE: we take hash as *string*, not as bytes, because the binary may
       //contain link references!
-      const context = keccak256({ type: 'string', value: binary });
-      let primarySource;
+      var context = (0, _helpers.keccak256)({ type: 'string', value: binary });
+      var primarySource = void 0;
       if (sourceMap !== undefined) {
-        primarySource = extractPrimarySource(sourceMap);
+        primarySource = (0, _helpers.extractPrimarySource)(sourceMap);
       }
       //otherwise leave it undefined
 
-      return {
-        ...state,
-        byContext: {
-          ...state.byContext,
-          [context]: {
-            contractName,
-            context,
-            binary,
-            sourceMap,
-            primarySource,
-            compiler,
-            abi,
-            contractId,
-            contractKind,
-            isConstructor
-          }
-        }
-      };
+      return _extends({}, state, {
+        byContext: _extends(
+          {},
+          state.byContext,
+          _defineProperty({}, context, {
+            contractName: contractName,
+            context: context,
+            binary: binary,
+            sourceMap: sourceMap,
+            primarySource: primarySource,
+            compiler: compiler,
+            abi: abi,
+            contractId: contractId,
+            contractKind: contractKind,
+            isConstructor: isConstructor
+          })
+        )
+      });
 
     case actions.NORMALIZE_CONTEXTS:
       return {
@@ -71,38 +152,59 @@ function contexts(state = DEFAULT_CONTEXTS, action) {
   }
 }
 
-const DEFAULT_INSTANCES = {
+var DEFAULT_INSTANCES = {
   byAddress: {},
   byContext: {}
 };
 
-function instances(state = DEFAULT_INSTANCES, action) {
+function instances() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_INSTANCES;
+  var action = arguments[1];
+
   switch (action.type) {
     /*
      * Adding a new address for context
      */
     case actions.ADD_INSTANCE:
-      let { address, context, binary } = action;
+      var address = action.address,
+        context = action.context,
+        binary = action.binary;
 
       // get known addresses for this context
-      let otherInstances = state.byContext[context] || [];
-      let otherAddresses = otherInstances.map(({ address }) => address);
+
+      var otherInstances = state.byContext[context] || [];
+      var otherAddresses = otherInstances.map(function(_ref) {
+        var address = _ref.address;
+        return address;
+      });
 
       return {
-        byAddress: {
-          ...state.byAddress,
+        byAddress: _extends(
+          {},
+          state.byAddress,
+          _defineProperty({}, address, {
+            address: address,
+            context: context,
+            binary: binary
+          })
+        ),
 
-          [address]: { address, context, binary }
-        },
-
-        byContext: {
-          ...state.byContext,
-
-          // reconstruct context instances to include new address
-          [context]: Array.from(new Set(otherAddresses).add(address)).map(
-            address => ({ address })
+        byContext: _extends(
+          {},
+          state.byContext,
+          _defineProperty(
+            {},
+            context,
+            Array.from(new Set(otherAddresses).add(address)).map(function(
+              address
+            ) {
+              return { address: address };
+            })
           )
-        }
+        )
       };
     case actions.UNLOAD_TRANSACTION:
       return DEFAULT_INSTANCES;
@@ -115,16 +217,24 @@ function instances(state = DEFAULT_INSTANCES, action) {
   }
 }
 
-const DEFAULT_TX = {
-  gasprice: new BN(0),
+var DEFAULT_TX = {
+  gasprice: new _bn2.default(0),
   origin: DecodeUtils.EVM.ZERO_ADDRESS
 };
 
-function tx(state = DEFAULT_TX, action) {
+function tx() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_TX;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_GLOBALS:
-      let { gasprice, origin } = action;
-      return { gasprice, origin };
+      var gasprice = action.gasprice,
+        origin = action.origin;
+
+      return { gasprice: gasprice, origin: origin };
     case actions.UNLOAD_TRANSACTION:
       return DEFAULT_TX;
     default:
@@ -132,15 +242,21 @@ function tx(state = DEFAULT_TX, action) {
   }
 }
 
-const DEFAULT_BLOCK = {
+var DEFAULT_BLOCK = {
   coinbase: DecodeUtils.EVM.ZERO_ADDRESS,
-  difficulty: new BN(0),
-  gaslimit: new BN(0),
-  number: new BN(0),
-  timestamp: new BN(0)
+  difficulty: new _bn2.default(0),
+  gaslimit: new _bn2.default(0),
+  number: new _bn2.default(0),
+  timestamp: new _bn2.default(0)
 };
 
-function block(state = DEFAULT_BLOCK, action) {
+function block() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined
+      ? arguments[0]
+      : DEFAULT_BLOCK;
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.SAVE_GLOBALS:
       return action.block;
@@ -151,31 +267,60 @@ function block(state = DEFAULT_BLOCK, action) {
   }
 }
 
-const globals = combineReducers({
-  tx,
-  block
+var globals = (0, _redux.combineReducers)({
+  tx: tx,
+  block: block
 });
 
-const info = combineReducers({
-  contexts
+var info = (0, _redux.combineReducers)({
+  contexts: contexts
 });
 
-const transaction = combineReducers({
-  instances,
-  globals
+var transaction = (0, _redux.combineReducers)({
+  instances: instances,
+  globals: globals
 });
 
-function callstack(state = [], action) {
+function callstack() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments[1];
+
   switch (action.type) {
     case actions.CALL: {
-      const { address, data, storageAddress, sender, value } = action;
-      return state.concat([{ address, data, storageAddress, sender, value }]);
+      var address = action.address,
+        data = action.data,
+        storageAddress = action.storageAddress,
+        sender = action.sender,
+        value = action.value;
+
+      return state.concat([
+        {
+          address: address,
+          data: data,
+          storageAddress: storageAddress,
+          sender: sender,
+          value: value
+        }
+      ]);
     }
 
     case actions.CREATE: {
-      const { binary, storageAddress, sender, value } = action;
+      var binary = action.binary,
+        _storageAddress = action.storageAddress,
+        _sender = action.sender,
+        _value = action.value;
+
       return state.concat(
-        [{ binary, data: '0x', storageAddress, sender, value }]
+        [
+          {
+            binary: binary,
+            data: '0x',
+            storageAddress: _storageAddress,
+            sender: _sender,
+            value: _value
+          }
+        ]
         //the empty data field is to make msg.data and msg.sig come out right
       );
     }
@@ -203,12 +348,10 @@ function defaultCodexFrame(address) {
   if (address !== undefined) {
     return {
       //there will be more here in the future!
-      accounts: {
-        [address]: {
-          //there will be more here in the future!
-          storage: {}
-        }
-      }
+      accounts: _defineProperty({}, address, {
+        //there will be more here in the future!
+        storage: {}
+      })
     };
   } else {
     return {
@@ -218,24 +361,38 @@ function defaultCodexFrame(address) {
   }
 }
 
-function codex(state = [], action) {
-  let newState, topCodex;
+function codex() {
+  var state =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var action = arguments[1];
 
-  const updateFrameStorage = (frame, address, slot, value) => {
-    let existingPage = frame.accounts[address] || { storage: {} };
-    return {
-      ...frame,
-      accounts: {
-        ...frame.accounts,
-        [address]: {
-          ...existingPage,
-          storage: {
-            ...existingPage.storage,
-            [slot]: value
-          }
-        }
-      }
-    };
+  var newState = void 0,
+    topCodex = void 0;
+
+  var updateFrameStorage = function updateFrameStorage(
+    frame,
+    address,
+    slot,
+    value
+  ) {
+    var existingPage = frame.accounts[address] || { storage: {} };
+    return _extends({}, frame, {
+      accounts: _extends(
+        {},
+        frame.accounts,
+        _defineProperty(
+          {},
+          address,
+          _extends({}, existingPage, {
+            storage: _extends(
+              {},
+              existingPage.storage,
+              _defineProperty({}, slot, value)
+            )
+          })
+        )
+      )
+    });
   };
 
   switch (action.type) {
@@ -249,7 +406,7 @@ function codex(state = [], action) {
       //that, otherwise make one from scratch
       newState =
         state.length > 0
-          ? [...state, state[state.length - 1]]
+          ? [].concat(_toConsumableArray(state), [state[state.length - 1]])
           : [defaultCodexFrame()];
       topCodex = newState[newState.length - 1];
       //now, do we need to add a new address to this stackframe?
@@ -261,22 +418,25 @@ function codex(state = [], action) {
         return newState;
       }
       //if we do
-      newState[newState.length - 1] = {
-        ...topCodex,
-        accounts: {
-          ...topCodex.accounts,
-          [action.storageAddress]: {
+      newState[newState.length - 1] = _extends({}, topCodex, {
+        accounts: _extends(
+          {},
+          topCodex.accounts,
+          _defineProperty({}, action.storageAddress, {
             storage: {}
             //there will be more here in the future!
-          }
-        }
-      };
+          })
+        )
+      });
       return newState;
 
     case actions.STORE: {
       //on a store, the relevant page should already exist, so we can just
       //add or update the needed slot
-      const { address, slot, value } = action;
+      var address = action.address,
+        slot = action.slot,
+        value = action.value;
+
       if (address === DecodeUtils.EVM.ZERO_ADDRESS) {
         //as always, we do not maintain a zero page
         return state;
@@ -296,13 +456,16 @@ function codex(state = [], action) {
       //loads are a little more complicated -- usually we do nothing, but if
       //it's an external load (there was nothing already there), then we want
       //to update *every* stackframe
-      const { address, slot, value } = action;
-      if (address === DecodeUtils.EVM.ZERO_ADDRESS) {
+      var _address = action.address,
+        _slot = action.slot,
+        _value2 = action.value;
+
+      if (_address === DecodeUtils.EVM.ZERO_ADDRESS) {
         //as always, we do not maintain a zero page
         return state;
       }
       topCodex = state[state.length - 1];
-      if (topCodex.accounts[address].storage[slot] !== undefined) {
+      if (topCodex.accounts[_address].storage[_slot] !== undefined) {
         //if we already have a value in the *top* stackframe, update *no*
         //stackframes; don't update the top (no need, it's just a load, not a
         //store), don't update the rest (that would be wrong, you might be
@@ -313,9 +476,9 @@ function codex(state = [], action) {
         //we're loading a value from a previous transaction!  That's not a
         //value that will get reverted if this call fails, so update *every*
         //stackframe
-        return state.map(frame =>
-          updateFrameStorage(frame, address, slot, value)
-        );
+        return state.map(function(frame) {
+          return updateFrameStorage(frame, _address, _slot, _value2);
+        });
       }
     }
 
@@ -343,15 +506,15 @@ function codex(state = [], action) {
   }
 }
 
-const proc = combineReducers({
-  callstack,
-  codex
+var proc = (0, _redux.combineReducers)({
+  callstack: callstack,
+  codex: codex
 });
 
-const reducer = combineReducers({
-  info,
-  transaction,
-  proc
+var reducer = (0, _redux.combineReducers)({
+  info: info,
+  transaction: transaction,
+  proc: proc
 });
 
-export default reducer;
+exports.default = reducer;

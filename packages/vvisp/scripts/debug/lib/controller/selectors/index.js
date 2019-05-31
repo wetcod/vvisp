@@ -1,27 +1,66 @@
-import debugModule from 'debug';
-const debug = debugModule('debugger:controller:selectors'); //eslint-disable-line no-unused-vars
+'use strict';
 
-import { createSelectorTree, createLeaf } from 'reselect-tree';
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-import evm from 'lib/evm/selectors';
-import solidity from 'lib/solidity/selectors';
-import trace from 'lib/trace/selectors';
+var _extends =
+  Object.assign ||
+  function(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
 
-import { anyNonSkippedInRange } from 'lib/ast/map';
+var _debug = require('debug');
+
+var _debug2 = _interopRequireDefault(_debug);
+
+var _reselectTree = require('reselect-tree');
+
+var _selectors = require('../../evm/selectors');
+
+var _selectors2 = _interopRequireDefault(_selectors);
+
+var _selectors3 = require('../../solidity/selectors');
+
+var _selectors4 = _interopRequireDefault(_selectors3);
+
+var _selectors5 = require('../../trace/selectors');
+
+var _selectors6 = _interopRequireDefault(_selectors5);
+
+var _map = require('../../ast/map');
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var debug = (0, _debug2.default)('debugger:controller:selectors'); //eslint-disable-line no-unused-vars
 
 /**
  * @private
  */
-const identity = x => x;
+var identity = function identity(x) {
+  return x;
+};
 
 /**
  * controller
  */
-const controller = createSelectorTree({
+var controller = (0, _reselectTree.createSelectorTree)({
   /**
    * controller.state
    */
-  state: state => state.controller,
+  state: function state(_state) {
+    return _state.controller;
+  },
   /**
    * controller.current
    */
@@ -29,17 +68,26 @@ const controller = createSelectorTree({
     /**
      * controller.current.functionDepth
      */
-    functionDepth: createLeaf([solidity.current.functionDepth], identity),
+    functionDepth: (0, _reselectTree.createLeaf)(
+      [_selectors4.default.current.functionDepth],
+      identity
+    ),
 
     /**
      * controller.current.executionContext
      */
-    executionContext: createLeaf([evm.current.call], identity),
+    executionContext: (0, _reselectTree.createLeaf)(
+      [_selectors2.default.current.call],
+      identity
+    ),
 
     /**
      * controller.current.willJump
      */
-    willJump: createLeaf([evm.current.step.isJump], identity),
+    willJump: (0, _reselectTree.createLeaf)(
+      [_selectors2.default.current.step.isJump],
+      identity
+    ),
 
     /**
      * controller.current.location
@@ -48,33 +96,41 @@ const controller = createSelectorTree({
       /**
        * controller.current.location.sourceRange
        */
-      sourceRange: createLeaf(
-        [solidity.current.sourceRange, '/current/trace/loaded'],
-        (range, loaded) => (loaded ? range : null)
+      sourceRange: (0, _reselectTree.createLeaf)(
+        [_selectors4.default.current.sourceRange, '/current/trace/loaded'],
+        function(range, loaded) {
+          return loaded ? range : null;
+        }
       ),
 
       /**
        * controller.current.location.source
        */
-      source: createLeaf(
-        [solidity.current.source, '/current/trace/loaded'],
-        (source, loaded) => (loaded ? source : null)
+      source: (0, _reselectTree.createLeaf)(
+        [_selectors4.default.current.source, '/current/trace/loaded'],
+        function(source, loaded) {
+          return loaded ? source : null;
+        }
       ),
 
       /**
        * controller.current.location.node
        */
-      node: createLeaf(
-        [solidity.current.node, '/current/trace/loaded'],
-        (node, loaded) => (loaded ? node : null)
+      node: (0, _reselectTree.createLeaf)(
+        [_selectors4.default.current.node, '/current/trace/loaded'],
+        function(node, loaded) {
+          return loaded ? node : null;
+        }
       ),
 
       /**
        * controller.current.location.isMultiline
        */
-      isMultiline: createLeaf(
-        [solidity.current.isMultiline, '/current/trace/loaded'],
-        (raw, loaded) => (loaded ? raw : false)
+      isMultiline: (0, _reselectTree.createLeaf)(
+        [_selectors4.default.current.isMultiline, '/current/trace/loaded'],
+        function(raw, loaded) {
+          return loaded ? raw : false;
+        }
       )
     },
 
@@ -85,12 +141,18 @@ const controller = createSelectorTree({
       /**
        * controller.current.trace.finished
        */
-      finished: createLeaf([trace.finished], identity),
+      finished: (0, _reselectTree.createLeaf)(
+        [_selectors6.default.finished],
+        identity
+      ),
 
       /**
        * controller.current.trace.loaded
        */
-      loaded: createLeaf([trace.loaded], identity)
+      loaded: (0, _reselectTree.createLeaf)(
+        [_selectors6.default.loaded],
+        identity
+      )
     }
   },
 
@@ -101,7 +163,9 @@ const controller = createSelectorTree({
     /**
      * controller.breakpoints (selector)
      */
-    _: createLeaf(['/state'], state => state.breakpoints),
+    _: (0, _reselectTree.createLeaf)(['/state'], function(state) {
+      return state.breakpoints;
+    }),
 
     /**
      * controller.breakpoints.resolver (selector)
@@ -111,53 +175,102 @@ const controller = createSelectorTree({
      * actually somewhere to break.  if no such line exists beyond that point, it
      * returns null instead.
      */
-    resolver: createLeaf([solidity.info.sources], sources => breakpoint => {
-      let adjustedBreakpoint;
-      if (breakpoint.node === undefined) {
-        let line = breakpoint.line;
-        let { source, ast } = sources[breakpoint.sourceId];
-        let lineLengths = source.split('\n').map(line => line.length);
-        //why does neither JS nor lodash have a scan function like Haskell??
-        //guess we'll have to do our scan manually
-        let lineStarts = [0];
-        for (let length of lineLengths) {
-          lineStarts.push(lineStarts[lineStarts.length - 1] + length + 1);
-          //+1 for the /n itself
-        }
-        debug(
-          'line: %s',
-          source.slice(lineStarts[line], lineStarts[line] + lineLengths[line])
-        );
-        while (
-          line < lineLengths.length &&
-          !anyNonSkippedInRange(ast, lineStarts[line], lineLengths[line])
-        ) {
-          debug('incrementing');
-          line++;
-        }
-        if (line >= lineLengths.length) {
-          adjustedBreakpoint = null;
-        } else {
-          adjustedBreakpoint = { ...breakpoint, line };
-        }
-      } else {
-        debug('node-based breakpoint');
-        adjustedBreakpoint = breakpoint;
+    resolver: (0, _reselectTree.createLeaf)(
+      [_selectors4.default.info.sources],
+      function(sources) {
+        return function(breakpoint) {
+          var adjustedBreakpoint = void 0;
+          if (breakpoint.node === undefined) {
+            var line = breakpoint.line;
+            var _sources$breakpoint$s = sources[breakpoint.sourceId],
+              source = _sources$breakpoint$s.source,
+              ast = _sources$breakpoint$s.ast;
+
+            var lineLengths = source.split('\n').map(function(line) {
+              return line.length;
+            });
+            //why does neither JS nor lodash have a scan function like Haskell??
+            //guess we'll have to do our scan manually
+            var lineStarts = [0];
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+              for (
+                var _iterator = lineLengths[Symbol.iterator](), _step;
+                !(_iteratorNormalCompletion = (_step = _iterator.next()).done);
+                _iteratorNormalCompletion = true
+              ) {
+                var length = _step.value;
+
+                lineStarts.push(lineStarts[lineStarts.length - 1] + length + 1);
+                //+1 for the /n itself
+              }
+            } catch (err) {
+              _didIteratorError = true;
+              _iteratorError = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                  _iterator.return();
+                }
+              } finally {
+                if (_didIteratorError) {
+                  throw _iteratorError;
+                }
+              }
+            }
+
+            debug(
+              'line: %s',
+              source.slice(
+                lineStarts[line],
+                lineStarts[line] + lineLengths[line]
+              )
+            );
+            while (
+              line < lineLengths.length &&
+              !(0, _map.anyNonSkippedInRange)(
+                ast,
+                lineStarts[line],
+                lineLengths[line]
+              )
+            ) {
+              debug('incrementing');
+              line++;
+            }
+            if (line >= lineLengths.length) {
+              adjustedBreakpoint = null;
+            } else {
+              adjustedBreakpoint = _extends({}, breakpoint, { line: line });
+            }
+          } else {
+            debug('node-based breakpoint');
+            adjustedBreakpoint = breakpoint;
+          }
+          return adjustedBreakpoint;
+        };
       }
-      return adjustedBreakpoint;
-    })
+    )
   },
 
   /**
    * controller.finished
    * deprecated alias for controller.current.trace.finished
    */
-  finished: createLeaf(['/current/finished'], finished => finished),
+  finished: (0, _reselectTree.createLeaf)(['/current/finished'], function(
+    finished
+  ) {
+    return finished;
+  }),
 
   /**
    * controller.isStepping
    */
-  isStepping: createLeaf(['./state'], state => state.isStepping)
+  isStepping: (0, _reselectTree.createLeaf)(['./state'], function(state) {
+    return state.isStepping;
+  })
 });
 
-export default controller;
+exports.default = controller;

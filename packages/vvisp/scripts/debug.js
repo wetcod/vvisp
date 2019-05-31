@@ -1,4 +1,10 @@
-module.exports = async function(files, options) {
+const Debugger = require('./debug/debugger');
+module.exports = async function(txHash) {
+  let bugger = await Debugger.forTx(txHash, { contracts, files, provider });
+  let session = bugger.connect();
+
+  /*
+   * deprecated code
   // from truffle-core/lib/commands/debug.js
   options = require('./utils/injectConfig')(options);
   debug = require('./debug/debugger');
@@ -19,4 +25,5 @@ module.exports = async function(files, options) {
   const txHash = config._[0]; //may be undefined
   return await new CLIDebugger(config).run(txHash);
   printOrSilent('Debugging . . . ', options);
+  */
 };
