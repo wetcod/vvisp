@@ -7,7 +7,8 @@ const flatten = require('./flatten');
 const genScript = require('./gen-script.js');
 const showState = require('./show-state');
 const init = require('./init');
-const coverage = require('./coverage')
+const coverage = require('./coverage');
+const test = require('./test');
 
 module.exports = [
   compile,
@@ -19,5 +20,6 @@ module.exports = [
   genScript,
   init,
   showState,
-  coverage
+  coverage,
+  test
 ];

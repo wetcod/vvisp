@@ -22,6 +22,7 @@ const getDependencyFiles = require('./getDependencyFiles');
 const getSourceCodeWithoutPragma = require('./getSourceCodeWithoutPragma');
 const getMaxVersion = require('./getPragmaMaxVersion');
 const parseLogs = require('./parseLogs');
+const test = require('./test');
 
 module.exports = {
   compile,
@@ -47,5 +48,6 @@ module.exports = {
   getDependencyFiles,
   getSourceCodeWithoutPragma,
   getMaxVersion,
-  parseLogs
+  parseLogs,
+  test
 };

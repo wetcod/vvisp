@@ -58,6 +58,7 @@
     "find-up": "^3.0.0",
     "fs-extra": "^7.0.0",
     "lodash": "^4.17.10",
+    "solidity-coverage": "git+https://github.com/rotcivegaf/solidity-coverage.git#5875f5b7bc74d447f3312c9c0e9fc7814b482477",
     "mustache": "^2.3.2",
     "node-find-folder": "^0.1.32",
     "openzeppelin-solidity": "2.1.3",
