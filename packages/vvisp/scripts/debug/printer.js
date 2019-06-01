@@ -6,7 +6,7 @@ const safeEval = require('safe-eval');
 
 const DebugUtils = require('truffle-debug-utils');
 
-const Debugger = require('./debugger').selectors;
+const Debugger = require('./lib/debugger').selectors;
 const { session, solidity, trace, controller } = selectors;
 
 class DebugPrinter {

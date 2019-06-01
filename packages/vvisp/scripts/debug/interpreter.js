@@ -6,7 +6,7 @@ const util = require('util');
 const ora = require('ora');
 
 const DebugUtils = require('truffle-debug-utils');
-const Debugger = require('./debugger').selectors;
+const Debugger = require('./lib/debugger').selectors;
 const { solidity, trace, evm, controller } = selectors;
 
 const analytics = require('../services/analytics');
