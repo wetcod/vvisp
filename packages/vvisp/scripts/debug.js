@@ -1,7 +1,7 @@
 const Debugger = require('./debug/debugger');
 module.exports = async function(txHash) {
-  let bugger = await Debugger.forTx(txHash, { contracts, files, provider });
-  let session = bugger.connect();
+  //let bugger = await Debugger.forTx(txHash, { contracts, files, provider });
+  //let session = bugger.connect();
 
   /*
    * deprecated code
@@ -24,6 +24,6 @@ module.exports = async function(txHash) {
 
   const txHash = config._[0]; //may be undefined
   return await new CLIDebugger(config).run(txHash);
-  printOrSilent('Debugging . . . ', options);
   */
+  printOrSilent('Debugging . . . ', options);
 };
