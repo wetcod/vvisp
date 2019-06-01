@@ -6,27 +6,31 @@ const util = require('util');
 const ora = require('ora');
 
 const DebugUtils = require('truffle-debug-utils');
-const Debugger = require('./lib/debugger').selectors;
-const { solidity, trace, evm, controller } = selectors;
 
-const analytics = require('../services/analytics');
-const ReplManager = require('../repl');
+var selector_trace = require('./lib/trace/selectors');
+var selector_evm = require('./lib/evm/selectors');
+var selector_solidity = require('./lib/solidity/selectors');
+var selector_controller = require('./lib/controller/selectors');
+
+const { solidity, trace, evm, controller } = {
+  selector_solidity,
+  selector_trace,
+  selector_evm,
+  selector_controller
+};
+
+const ReplManager = require('./repl');
 
 const { DebugPrinter } = require('./printer');
 
 function watchExpressionAnalytics(raw) {
   if (raw.includes('!<')) {
-    //don't send analytics for watch expressions involving selectors
     return;
   }
   let expression = raw.trim();
   //legal Solidity identifiers (= legal JS identifiers)
   let identifierRegex = /^[a-zA-Z_$][a-zA-Z_$0-9]*$/;
   let isVariable = expression.match(identifierRegex) !== null;
-  analytics.send({
-    command: 'debug: watch expression',
-    args: { isVariable }
-  });
 }
 
 class DebugInterpreter {
