@@ -12,13 +12,15 @@ const DebugUtils = require('truffle-debug-utils');
 const { DebugInterpreter } = require('./interpreter');
 const { DebugCompiler } = require('./compiler');
 
+const { printOrSilent } = require('@haechi-labs/vvisp-utils');
+
 class CLIDebugger {
   constructor(config) {
     this.config = config;
   }
 
   async run(txHash) {
-    this.config.logger.log('Starting Truffle Debugger...');
+    printOrSilent('Starting Truffle Debugger...');
 
     // override BN display
     this._setupCustomInspect();
