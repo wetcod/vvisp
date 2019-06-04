@@ -3,33 +3,29 @@ pragma solidity ^0.5.0;
 
 contract ShowStateA {
 
-    uint256 a;
-
-    struct MyStruct {
-        uint256 b;
-        uint128 c;
-        uint128 d;
-        uint[3] e;
+    struct Addr {
+        uint a;
+        uint b;
     }
 
-    uint[4] arr;
-    uint[4][3] doublearr;
-    MyStruct[3] sarray;
+    struct Info {
+        uint64 a;
+        uint64 b;
+        mapping(uint64 => uint64) c;
+        Addr[2] d;
+    }
+
+    struct Person {
+        Info a;
+        uint200[3] b;
+        mapping(uint => Addr) c;
+    }
+
+    Person a;
+    Person[2] b;
+    Person c;
 
     constructor() public {
-        a = 1;
-        arr = [
-            2, 3, 4, 5
-        ];
-        for (uint i = 0; i < 4; ++i) {
-            for (uint j = 0; j < 3; ++j) {
-                doublearr[i][j] = i + j;
-            }
-        }
-        for (uint i = 0; i < 3; ++i) {
-            sarray[i] = MyStruct(
-                i, uint128(i + 1), uint128(i + 2), [i, i + 1, i + 2]
-            );
-        }
+        a = Person(1, 2, )
     }
 }
