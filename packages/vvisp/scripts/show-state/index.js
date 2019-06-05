@@ -117,7 +117,7 @@ async function compile(srcPath) {
   });
   const solcOutput = solc.compile(inputDescription);
 
-  fs.writeFileSync('testast.json', solcOutput);
+  //fs.writeFileSync('testast.json', solcOutput);
 
   return JSON.parse(solcOutput);
 }
