@@ -20,7 +20,7 @@ class CLIDebugger {
   }
 
   async run(txHash) {
-    printOrSilent('Starting Truffle Debugger...');
+    printOrSilent('Starting VVISP Debugger...');
 
     // override BN display
     this._setupCustomInspect();
