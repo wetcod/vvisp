@@ -1,28 +1,12 @@
-'use strict';
+const debugModule = require('debug');
+const debug = debugModule('debugger:store:development');
 
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.default = configureStore;
+const { composeWithDevTools } = require('remote-redux-devtools');
 
-var _debug = require('debug');
-
-var _debug2 = _interopRequireDefault(_debug);
-
-var _remoteReduxDevtools = require('remote-redux-devtools');
-
-var _common = require('./common');
-
-var _common2 = _interopRequireDefault(_common);
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
-
-var debug = (0, _debug2.default)('debugger:store:development');
+const commonConfigure = require('./common');
 
 function configureStore(reducer, saga, initialState) {
-  var composeEnhancers = (0, _remoteReduxDevtools.composeWithDevTools)({
+  const composeEnhancers = composeWithDevTools({
     realtime: false,
     actionsBlacklist: [
       'RECEIVE_TRACE',
@@ -34,15 +18,13 @@ function configureStore(reducer, saga, initialState) {
       'BEGIN_STEP',
       'NEXT'
     ],
-    stateSanitizer: function stateSanitizer(state) {
-      return {
-        // session: state.session,
-        // context: state.context,
-        // evm: state.evm,
-        // solidity: state.solidity,
-        // data: state.data,
-      };
-    },
+    stateSanitizer: state => ({
+      // session: state.session,
+      // context: state.context,
+      // evm: state.evm,
+      // solidity: state.solidity,
+      // data: state.data,
+    }),
 
     startOn: 'SESSION_READY',
     name: 'truffle-debugger',
@@ -50,5 +32,7 @@ function configureStore(reducer, saga, initialState) {
     port: 11117
   });
 
-  return (0, _common2.default)(reducer, saga, initialState, composeEnhancers);
+  return commonConfigure(reducer, saga, initialState, composeEnhancers);
 }
+
+module.exports = configureStore;

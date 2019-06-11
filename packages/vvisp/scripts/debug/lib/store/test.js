@@ -1,2 +1,2 @@
-import configureStore from './common';
-export default configureStore;
+const configureStore = require('./common');
+module.exports = configureStore;

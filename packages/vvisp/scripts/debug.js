@@ -63,5 +63,4 @@ module.exports = async function(txHash) {
   let session = bugger.connect();
     //await session.ready();
   */
-  printOrSilent('Debugging Finishied!');
 };
