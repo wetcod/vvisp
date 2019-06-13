@@ -85,7 +85,8 @@
     "truffle-artifactor": "^4.0.18",
     "truffle-compile": "^4.1.0",
     "truffle-debugger": "^5.0.14",
-    "truffle-debug-utils": "^1.0.18"
+    "truffle-debug-utils": "^1.0.18",
+    "blessed": "^0.1.81"
   },
   "devDependencies": {
     "bdd-stdin": "^0.2.0",

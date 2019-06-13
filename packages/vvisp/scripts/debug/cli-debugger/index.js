@@ -18,7 +18,7 @@ class CLIDebugger {
   }
 
   async run(txHash) {
-    this.config.logger.log("Starting vvisp Debugger...");
+    console.log("Starting vvisp Debugger...");
 
     // override BN display
     this._setupCustomInspect();

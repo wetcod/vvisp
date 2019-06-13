@@ -13,6 +13,7 @@ const { solidity, trace, evm, controller } = selectors;
 const ReplManager = require("../repl");
 
 const { DebugPrinter } = require("./printer");
+const { DebugTUI } = require("./tui");
 
 function watchExpressionAnalytics(raw) {
   if (raw.includes("!<")) {
@@ -33,7 +34,7 @@ class DebugInterpreter {
   constructor(config, session, txHash) {
     this.session = session;
     this.network = config.network;
-    this.printer = new DebugPrinter(config, session);
+    this.printer = new DebugTUI(config, session);
     this.txHash = txHash;
     this.lastCommand = "n";
 
@@ -254,7 +255,6 @@ class DebugInterpreter {
       this.printer.printHelp();
       prompt = DebugUtils.formatPrompt(this.network);
     }
-
     this.repl.start({
       prompt,
       interpreter: util.callbackify(this.interpreter.bind(this)),
