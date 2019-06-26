@@ -6,60 +6,65 @@ const {
   getAllFiles,
   printOrSilent
 } = require('@haechi-labs/vvisp-utils');
+const { STATE_PATH } = require('../config/Constant');
 
 module.exports = async function(files, options) {
   options = require('./utils/injectConfig')(options);
 
-  try {
-    execSync('command -v docker');
-  } catch {
-    console.error('Requirement: docker must be installed');
-    console.error('>>> $ sudo apt install docker')
-
-    return;
-  }
-
-  try {
-    execSync('docker image inspect mythril/myth', { stdio: 'pipe' });
-  } catch {
-    console.error('Requirement: mythril/myth must be pulled');
-    console.error('>>> $ docker pull mythril/myth');
-
-    return;
-  }
-
   if (options.allContract) {
-    files = getAllFiles('./contracts', filePath => {
+    files = getAllFiles('./contracts', (filePath) => {
       return path.parse(filePath).ext === '.sol';
     });
   }
 
-  if (files.length === 0) {
-    const url = `${options.config.network_config.host}:${options.config.network_config.port}`;
-    const vvispState = JSON.parse(fs.readFileSync('./state.vvisp.json', 'utf-8'));
-
-    Object.keys(vvispState.contracts)
-      .forEach(contractName => {
-        printOrSilent(chalk.bold(`Contract: ${contractName}`), options);
-
-        const address = vvispState.contracts[contractName].address;
-        const command = `docker run --network=host mythril/myth -xa ${address} --rpc ${url}`;
-        const result = execSync(command, { stdio: 'pipe' }).toString();
-
-        printOrSilent(result, options);
-    });
-  } else {
-    files
-      .forEach(file => {
-        printOrSilent(chalk.bold(`File: ${file}`), options);
-
-        const dirName = path.dirname(path.resolve(file));
-        const baseName = path.basename(file);
-
-        const command = `docker run -v ${dirName}:/tmp mythril/myth -x tmp/${baseName}`;
-        const result = execSync(command, { stdio: 'pipe' }).toString();
-
-        printOrSilent(result, options);
-      });
+  try {
+    if (files.length === 0) {
+      analyzeOnChain(options);
+    } else {
+      analyzeOffChain(files, options);
+    }
+  } catch (error) {
+    console.error(error);
+    printRequirements();
   }
 };
+
+function analyzeOnChain(options) {
+  const url = `${options.config.network_config.host}:${options.config.network_config.port}`;
+  const vvispState = JSON.parse(fs.readFileSync(STATE_PATH, 'utf-8'));
+
+  Object.keys(vvispState.contracts)
+    .forEach(contractName => {
+      printOrSilent(chalk.bold(`Contract: ${contractName}`), options);
+
+      const address = vvispState.contracts[contractName].address;
+      const command = `docker run --network=host mythril/myth -xa ${address} --rpc ${url}`;
+      const result = execSync(command, { stdio: 'pipe' }).toString();
+
+      printOrSilent(result, options);
+    });
+}
+
+function analyzeOffChain(files, options) {
+  files
+    .forEach(file => {
+      printOrSilent(chalk.bold(`File: ${file}`), options);
+
+      const dirName = path.dirname(path.resolve(file));
+      const baseName = path.basename(file);
+
+      console.log(`${dirName}`);
+      console.log(`${baseName}`);
+
+      const command = `docker run -v ${dirName}:/tmp mythril/myth -x tmp/${baseName}`;
+      const result = execSync(command).toString();
+
+      printOrSilent(result, options);
+    });
+}
+
+function printRequirements() {
+  console.error('# docker must be installed');
+  console.error('# docker\'s permission must be set properly');
+  console.error('# mythril/myth must be pulled');
+}
